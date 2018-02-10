@@ -1,3 +1,10 @@
+#############################################################################
+TO USE THIS DATASET, please download the LJ dataset at 
+https://keithito.com/LJ-Speech-Dataset !!!
+afterwards, run prepare.py for json conversion
+#############################################################################
+
+
 -----------------------------------------------------------------------------
 The LJ Speech Dataset
 
@@ -105,6 +112,8 @@ https://librivox.org/pages/public-domain.
 
 
 CREDITS
+**To use this dataset, you must download the dataset at https://keithito.com/LJ-Speech-Dataset/ and unzip it in this folder. (so the wavs folder is placed here)**
+
 
 This dataset consists of excerpts from the following works:
 

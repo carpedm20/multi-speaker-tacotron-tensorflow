@@ -95,7 +95,7 @@ Because the automatic generation is extremely naive, the dataset is noisy. Howev
 
 ### 2-3. Generate English datasets
 
-1. Download speech dataset at https://keithito.com/LJ-Speech-Dataset/
+1. Download speech dataset at https://keithito.com/LJ-Speech-Dataset/ into datasets/LJSpeech_1_0 folder (folder "wavs" and metadata.csv should be placed inside the folder)
 
 2. Convert metadata CSV file to json file. (arguments are available for changing preferences)
 		
@@ -103,7 +103,7 @@ Because the automatic generation is extremely naive, the dataset is noisy. Howev
 
 3. Finally, generate numpy files which will be used in training.
 		
-		python3 -m datasets.generate_data ./datasets/LJSpeech_1_0
+		python3 -m datasets.generate_data ./datasets/LJSpeech_1_0/alignment.json
 		
 
 ### 3. Train a model

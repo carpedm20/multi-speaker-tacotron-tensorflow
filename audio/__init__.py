@@ -8,7 +8,6 @@ from hparams import hparams
 import librosa
 import librosa.filters
 
-
 def load_audio(path, pre_silence_length=0, post_silence_length=0):
     audio = librosa.core.load(path, sr=hparams.sample_rate)[0]
     if pre_silence_length > 0 or post_silence_length > 0:

@@ -17,6 +17,7 @@ from audio.get_duration import get_durations
 
 
 _pad = 0
+_p_cmudict=0.5
 
 def get_frame(path):
     data = np.load(path)
@@ -88,6 +89,7 @@ class DataFeeder(threading.Thread):
         self._step = 0
         self._offset = defaultdict(lambda: 2)
         self._batches_per_group = batches_per_group
+        self._cmudict=None
 
         self.rng = np.random.RandomState(config.random_seed)
         self.data_type = data_type
@@ -192,6 +194,20 @@ class DataFeeder(threading.Thread):
         else:
             self.static_batches = None
 
+        # Load CMUDict: If enabled, this will randomly substitute some words in the training data with
+        # their ARPABet equivalents, which will allow you to also pass ARPABet to the model for
+        # synthesis (useful for proper nouns, etc.)
+        if hparams.use_cmudict:
+          cmudict_path = os.path.join(self.data_dirs[0], 'cmudict-0.7b')
+          if not os.path.isfile(cmudict_path):
+            raise Exception('If use_cmudict=True, you must download ' +
+              'http://svn.code.sf.net/p/cmusphinx/code/trunk/cmudict/cmudict-0.7b to %s'  % cmudict_path)
+          self._cmudict = text.cmudict.CMUDict(cmudict_path, keep_ambiguous=False)
+          log('Loaded CMUDict with %d unambiguous entries' % len(self._cmudict))
+        else:
+          self._cmudict = None
+
+
     def start_in_session(self, session, start_step):
         self._step = start_step
         self._session = session
@@ -276,6 +292,13 @@ class DataFeeder(threading.Thread):
         input_data = data['tokens']
         mel_target = data['mel']
 
+        # cmu_dict enabled -> convert some chararcter in known words to arpabet (p_cmudict possibilty)
+        if self._cmudict and random.random()<_p_cmudict:
+            txt = text.sequence_to_text(input_data, False, True)
+            txt = ' '.join([self._maybe_get_arpabet(word) for word in txt.split(' ')])
+            input_data = (text.text_to_sequence(txt, as_token=False))
+
+
         if 'loss_coeff' in data:
             loss_coeff = data['loss_coeff']
         else:
@@ -284,6 +307,10 @@ class DataFeeder(threading.Thread):
 
         return (input_data, loss_coeff, mel_target, linear_target, 
                 self.data_dir_to_id[data_dir], len(linear_target))
+    
+    def _maybe_get_arpabet(self, word):
+        arpabet = self._cmudict.lookup(word)
+        return '{%s}' % arpabet[0] if arpabet is not None and random.random() < 0.5 else word
 
 
 def _prepare_batch(batch, reduction_factor, rng, data_type=None):
