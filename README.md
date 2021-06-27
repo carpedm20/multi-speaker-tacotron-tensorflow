@@ -103,7 +103,7 @@ Because the automatic generation is extremely naive, the dataset is noisy. Howev
 
 3. Finally, generate numpy files which will be used in training.
 		
-		python3 -m datasets.generate_data ./datasets/LJSpeech_1_0
+		python3 -m datasets.generate_data ./datasets/LJSpeech_1_0/alignment.json
 		
 
 ### 3. Train a model
